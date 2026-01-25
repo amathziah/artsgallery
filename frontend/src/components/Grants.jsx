@@ -13,7 +13,7 @@ const Grants = () => {
 
   const fetchGrants = async () => {
     try {
-      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/grants`         );
+      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/grants`         );
       setGrants(data);
     } catch (error) {
       console.error('Failed to fetch grants');
