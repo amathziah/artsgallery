@@ -43,3 +43,8 @@ export const register = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const profile = async (req, res) => {
+  res.status(200).json(req.admin);
+};
+
