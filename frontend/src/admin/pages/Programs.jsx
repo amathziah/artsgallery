@@ -3,6 +3,9 @@ import AdminLayout from '../components/AdminLayout';
 import api from '../utils/api';
 import { Plus, Edit, Trash2, X } from 'lucide-react';
 
+const BACKEND_URL = import.meta.env.VITE_API_URL.replace('/api', '');
+
+
 const AdminPrograms = () => {
   const [programs, setPrograms] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -64,7 +67,7 @@ const AdminPrograms = () => {
   const handleEdit = (program) => {
     setFormData({ title: program.title, description: program.description });
     setEditingId(program._id);
-    setPosterPreview(program.posterUrl ? `http://localhost:5001${program.posterUrl}` : null);
+    setPosterPreview(program.posterUrl ? `${BACKEND_URL}${program.posterUrl}` : null);
     setShowForm(true);
   };
 

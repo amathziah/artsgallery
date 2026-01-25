@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AdminLayout from '../components/AdminLayout';
 import api from '../utils/api';
 import { Plus, Edit, Trash2, X } from 'lucide-react';
+const BACKEND_URL = import.meta.env.VITE_API_URL.replace('/api', '');
 
 const AdminGrants = () => {
   const [grants, setGrants] = useState([]);
@@ -44,7 +45,7 @@ const AdminGrants = () => {
       submitData.append('eligibility', formData.eligibility);
       submitData.append('awardee', formData.awardee);
       submitData.append('jury', formData.jury);
-      
+
       if (posterFile) {
         submitData.append('poster', posterFile);
       }
@@ -78,7 +79,8 @@ const AdminGrants = () => {
       jury: grant.jury.join(', ')
     });
     setEditingId(grant._id);
-    setPosterPreview(grant.posterUrl ? `http://localhost:5001${grant.posterUrl}` : null);
+    setPosterPreview(grant.posterUrl ? `${BACKEND_URL}${grant.posterUrl}` : null);
+
     setShowForm(true);
   };
 

@@ -12,7 +12,8 @@ const Programs = () => {
 
   const fetchPrograms = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5001/api/programs');
+     const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/programs`);
+
       setPrograms(data);
     } catch (error) {
       console.error('Failed to fetch programs');
@@ -57,7 +58,7 @@ const Programs = () => {
               <div className="relative overflow-hidden bg-gray-100 aspect-[4/3]">
                 {program.posterUrl ? (
                   <img
-                    src={`http://localhost:5001${program.posterUrl}`}
+                   src={`${import.meta.env.VITE_API_URL.replace('/api', '')}${program.posterUrl}`}
                     alt={program.title}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />

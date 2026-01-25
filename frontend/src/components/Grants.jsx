@@ -13,7 +13,7 @@ const Grants = () => {
 
   const fetchGrants = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5001/api/grants');
+      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/grants`         );
       setGrants(data);
     } catch (error) {
       console.error('Failed to fetch grants');
@@ -49,7 +49,7 @@ const Grants = () => {
               >
                 {program.posterUrl && (
                   <img
-                    src={`http://localhost:5001${program.posterUrl}`}
+                   src={`${import.meta.env.VITE_API_URL.replace('/api', '')}${program.posterUrl}`}
                     alt={program.title}
                     className="w-full h-48 object-cover mb-6"
                   />
