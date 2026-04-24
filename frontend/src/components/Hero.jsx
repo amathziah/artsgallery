@@ -23,10 +23,24 @@ const Hero = ({ slides: propSlides }) => {
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
 
   if (slides.length === 0) return (
-    <div className="relative h-screen w-full overflow-hidden bg-gray-900 flex items-end pb-24 px-6 md:px-12">
-      <div className="container mx-auto max-w-6xl text-white">
-        <h1 className="text-4xl md:text-6xl font-light mb-4">Welcome</h1>
-        <p className="text-xl md:text-2xl font-light">Saat Saath Arts Foundation</p>
+    <div className="relative h-screen w-full overflow-hidden bg-black">
+      <div className="absolute inset-0">
+        <img src={bikanerHeroImage} alt="" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-black/50" />
+      </div>
+
+      <div className="relative h-full flex flex-col justify-end pb-24 px-6 md:px-12 text-white">
+        <div className="container mx-auto max-w-6xl">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.35em] text-white/65">
+            Saat Saath Arts Foundation
+          </p>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-light mb-4 max-w-4xl leading-tight">
+            Research-led exchange through contemporary art.
+          </h1>
+          <p className="text-xl md:text-2xl max-w-2xl font-light text-white/85">
+            Grants, exhibitions, and long-term public initiatives from India.
+          </p>
+        </div>
       </div>
     </div>
   );

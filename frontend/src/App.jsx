@@ -10,6 +10,7 @@ import About from './components/About';
 import ProgramsSection from './components/Programs';
 import GrantsSection from './components/Grants';
 import Footer from './components/Footer';
+import SiteLoader from './components/SiteLoader';
 
 import GrantsPage from './pages/GrantsPage';
 import ProgramsPage from './pages/ProgramsPage';
@@ -28,11 +29,42 @@ import AdminConjecturesEditor from './admin/pages/ConjecturesEditor';
 import AdminHomepageSections from './admin/pages/HomepageSectionsEditor';
 
 function PublicLayout() {
-  const [sc, setSc] = useState(null);
+  const [sc, setSc] = useState(() => {
+    try {
+      const cached = localStorage.getItem('siteContentCache');
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [isInitialLoading, setIsInitialLoading] = useState(() => !sc);
 
   useEffect(() => {
-    api.get('/site-content').then((r) => setSc(r.data)).catch(() => {});
+    let cancelled = false;
+
+    api.get('/site-content')
+      .then((r) => {
+        if (cancelled) return;
+        setSc(r.data);
+        try {
+          localStorage.setItem('siteContentCache', JSON.stringify(r.data));
+        } catch {
+          // Ignore storage issues and keep the network response in memory.
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setIsInitialLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  if (isInitialLoading && !sc) {
+    return <SiteLoader />;
+  }
 
   return (
     <>

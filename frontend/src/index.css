@@ -1,1 +1,24 @@
 @import "tailwindcss";
+
+html {
+  background: #000;
+}
+
+body,
+#root {
+  min-height: 100vh;
+}
+
+@keyframes site-loader-sweep {
+  0% {
+    transform: translateX(-130%);
+  }
+
+  100% {
+    transform: translateX(320%);
+  }
+}
+
+.site-loader-bar {
+  animation: site-loader-sweep 1.8s ease-in-out infinite;
+}
