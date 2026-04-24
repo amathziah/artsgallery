@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AdminLayout from '../components/AdminLayout';
 import api from '../utils/api';
 import { Plus, Edit, Trash2, X } from 'lucide-react';
-const BACKEND_URL = import.meta.env.VITE_API_URL.replace('/api', '');
+const BACKEND_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5001/api').replace('/api', '');
 
 const AdminGrants = () => {
   const [grants, setGrants] = useState([]);

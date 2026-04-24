@@ -7,6 +7,7 @@ import connectDB from './config/database.js';
 import authRoutes from './routes/authRoutes.js';
 import programRoutes from './routes/programRoutes.js';
 import grantRoutes from './routes/grantRoutes.js';
+import siteContentRoutes from './routes/siteContentRoutes.js';
 
 // Get the current filename and directory
 const __filename = fileURLToPath(import.meta.url);
@@ -29,6 +30,7 @@ if (process.env.NODE_ENV === 'production') {
 app.use('/api/auth', authRoutes);
 app.use('/api/programs', programRoutes);
 app.use('/api/grants', grantRoutes);
+app.use('/api/site-content', siteContentRoutes);
 
 // Serve frontend build if in production
 if (process.env.NODE_ENV === 'production') {

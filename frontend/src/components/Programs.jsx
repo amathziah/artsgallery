@@ -1,105 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar, MapPin, ExternalLink } from 'lucide-react';
-import axios from 'axios';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import initiative1Image from '../assets/initiative1.png';
+import sculptureParkImage from '../assets/sculpture-park2.png';
 
-const Programs = () => {
-  const [programs, setPrograms] = useState([]);
-  const [loading, setLoading] = useState(true);
+const BACKEND = 'http://localhost:5001';
+const resolveImg = (url, idx) => {
+  if (url) return url.startsWith('/') ? `${BACKEND}${url}` : url;
+  return idx === 3 ? sculptureParkImage : initiative1Image;
+};
 
-  useEffect(() => {
-    fetchPrograms();
-  }, []);
-
-  const fetchPrograms = async () => {
-    try {
-     const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/programs`);
-
-      setPrograms(data);
-    } catch (error) {
-      console.error('Failed to fetch programs');
-    } finally {
-      setLoading(false);
-    }
-  };
+const Programs = ({ data, sectionLabel, sectionHeading }) => {
+  const cards = data?.cards || [];
+  const label = sectionLabel || 'Programs & Initiatives';
+  const heading = sectionHeading || 'Engaging Communities Through Art';
 
   return (
     <section id="programs" className="py-20 px-6 md:px-12 bg-white">
       <div className="container mx-auto max-w-7xl">
-        <span className="text-xs font-semibold tracking-[0.25em] text-gray-500 uppercase mb-4 block">
-          Programs & Initiatives
-        </span>
+        <span className="text-xs font-semibold tracking-[0.25em] text-gray-500 uppercase mb-4 block">{label}</span>
+        <h2 className="text-4xl md:text-5xl font-light text-gray-900 mb-16">{heading}</h2>
 
-        <h2 className="text-4xl md:text-5xl font-light text-gray-900 mb-16">
-          Engaging Communities Through Art
-        </h2>
-
-        {/* Loading */}
-        {loading && (
-          <div className="text-center text-gray-500">
-            Loading programs...
-          </div>
+        {cards.length === 0 && (
+          <div className="text-center text-gray-400 py-12">No programs yet.</div>
         )}
 
-        {/* Empty */}
-        {!loading && programs.length === 0 && (
-          <div className="text-center text-gray-500">
-            No programs available yet.
-          </div>
-        )}
-
-        {/* GRID */}
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
-          {programs.map((program) => (
-            <div
-              key={program._id}
-              className="group flex flex-col border border-gray-200 hover:border-black transition-colors"
-            >
-              {/* Poster */}
-              <div className="relative overflow-hidden bg-gray-100 aspect-[4/3]">
-                {program.posterUrl ? (
-                  <img
-                   src={`${import.meta.env.VITE_API_URL.replace('/api', '')}${program.posterUrl}`}
-                    alt={program.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-sm text-gray-400">
-                    No Poster
+          {cards.map((card, i) => (
+            <div key={i} className="group flex flex-col border border-gray-200 hover:border-black transition-colors">
+              <div className="relative overflow-hidden bg-gray-100 aspect-4/3">
+                <img src={resolveImg(card.imageUrl, i)} alt={card.title}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  onError={(e) => { e.target.src = initiative1Image; }} />
+              </div>
+              <div className="flex flex-col flex-1 p-6">
+                <h3 className="text-xl font-medium text-gray-900 mb-3">{card.title}</h3>
+                {card.date && <p className="text-xs text-gray-500 mb-3 uppercase tracking-wider">{card.date}</p>}
+                <p className="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-4">{card.description}</p>
+                {card.link && (
+                  <div className="mt-auto">
+                    {card.isExternal ? (
+                      <a href={card.link} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-black hover:opacity-70 transition-opacity">
+                        Learn More
+                      </a>
+                    ) : (
+                      <Link to={card.link}
+                        className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-black hover:opacity-70 transition-opacity">
+                        Learn More
+                      </Link>
+                    )}
                   </div>
                 )}
-              </div>
-
-              {/* Content */}
-              <div className="flex flex-col flex-1 p-6">
-                <h3 className="text-xl font-medium text-gray-900 mb-3">
-                  {program.title}
-                </h3>
-
-                <div className="flex flex-wrap gap-4 text-xs text-gray-500 mb-4">
-                  <div className="flex items-center gap-1">
-                    <MapPin size={14} />
-                    <span>Various Locations</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Calendar size={14} />
-                    <span>{new Date(program.createdAt).getFullYear()}</span>
-                  </div>
-                </div>
-
-                <p className="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-4">
-                  {program.description}
-                </p>
-
-                {/* CTA */}
-                <div className="mt-auto">
-                  <a
-                    href="#contact"
-                    className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-black hover:opacity-70 transition-opacity"
-                  >
-                    Learn More
-                    <ExternalLink size={14} />
-                  </a>
-                </div>
               </div>
             </div>
           ))}
@@ -110,4 +61,3 @@ const Programs = () => {
 };
 
 export default Programs;
-

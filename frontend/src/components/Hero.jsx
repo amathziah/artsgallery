@@ -1,99 +1,90 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import bikanerHeroImage from '../assets/bikaner-hero.png';
 
-const Hero = () => {
+const BACKEND = 'http://localhost:5001';
+const resolveImg = (url) => {
+  if (!url) return bikanerHeroImage;
+  return url.startsWith('/') ? `${BACKEND}${url}` : url;
+};
+
+const Hero = ({ slides: propSlides }) => {
+  const slides = propSlides && propSlides.length > 0 ? propSlides : [];
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const slides = [
-    {
-      id: 1,
-      image: "https://images.unsplash.com/photo-1599661046289-e318d6d48ed1?q=80&w=2070&auto=format&fit=crop", 
-      title: "The Sculpture Park Jaipur",
-      subtitle: "A long-term public art project at Madhavendra Palace",
-      ctaText: "Visit Sculpture Park",
-      ctaLink: "https://www.thesculpturepark.org/",
-      isExternal: true
-    },
-    {
-      id: 2,
-      image: "https://images.unsplash.com/photo-1549892782-b7d159f8c374?q=80&w=2037&auto=format&fit=crop", 
-      title: "Bikaner House",
-      subtitle: "Advancing critical dialogue through visual art",
-      ctaText: "View Programs",
-      ctaLink: "#programs",
-      isExternal: false
-    },
-    {
-      id: 3,
-      image: "https://images.unsplash.com/photo-1507643179173-617d6c6f6752?q=80&w=2068&auto=format&fit=crop", 
-      title: "Supporting Curatorial Inquiry",
-      subtitle: "Research-led engagement and institutional collaboration",
-      ctaText: "About Us",
-      ctaLink: "#about",
-      isExternal: false
-    }
-  ];
-
   useEffect(() => {
-    const slideInterval = setInterval(() => {
-      setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
-    }, 5000); 
-    return () => clearInterval(slideInterval);
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(timer);
   }, [slides.length]);
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
-  const prevSlide = () => setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+
+  if (slides.length === 0) return (
+    <div className="relative h-screen w-full overflow-hidden bg-gray-900 flex items-end pb-24 px-6 md:px-12">
+      <div className="container mx-auto max-w-6xl text-white">
+        <h1 className="text-4xl md:text-6xl font-light mb-4">Welcome</h1>
+        <p className="text-xl md:text-2xl font-light">Saat Saath Arts Foundation</p>
+      </div>
+    </div>
+  );
+
+  const slide = slides[currentSlide];
 
   return (
-    <header className="relative h-screen flex items-center justify-center overflow-hidden bg-black">
-      {slides.map((slide, index) => (
-        <div 
-          key={slide.id}
-          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
-        >
-          <img src={slide.image} alt={slide.title} className="w-full h-full object-cover opacity-50" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/30" />
-        </div>
-      ))}
-      
-      <div className="relative z-10 text-center text-white px-6 max-w-6xl mx-auto">
-        <h1 className="text-6xl md:text-8xl lg:text-9xl font-light tracking-tight mb-8 leading-none">
-          {slides[currentSlide].title}
-        </h1>
-        <div className="w-24 h-px bg-white/60 mx-auto mb-8"></div>
-        <p className="text-lg md:text-2xl font-light mb-14 tracking-wide text-white/90 max-w-3xl mx-auto">
-          {slides[currentSlide].subtitle}
-        </p>
-        
-        <a 
-          href={slides[currentSlide].ctaLink} 
-          target={slides[currentSlide].isExternal ? "_blank" : "_self"}
-          rel={slides[currentSlide].isExternal ? "noopener noreferrer" : ""}
-          className="inline-flex items-center gap-3 px-10 py-4 bg-white text-black hover:bg-black hover:text-white border-2 border-white transition-all duration-300 uppercase tracking-[0.25em] text-xs font-semibold"
-        >
-          {slides[currentSlide].ctaText}
-          {slides[currentSlide].isExternal && <ExternalLink size={14} />}
-        </a>
+    <div className="relative h-screen w-full overflow-hidden">
+      <div className="absolute inset-0">
+        <img src={resolveImg(slide.imageUrl)} alt={slide.title} className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-black/40" />
       </div>
 
-      <div className="absolute bottom-20 left-0 right-0 z-20 flex justify-center items-center gap-6">
-        <button onClick={prevSlide} className="p-2 text-white/60 hover:text-white transition-colors">
-          <ChevronLeft size={32} />
-        </button>
-        <div className="flex gap-2">
-          {slides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentSlide(index)}
-              className={`h-2 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-white w-10' : 'bg-white/30 w-2'}`}
-            />
-          ))}
+      <div className="relative h-full flex flex-col justify-end pb-24 px-6 md:px-12 text-white">
+        <div className="container mx-auto max-w-6xl">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-light mb-4 max-w-4xl leading-tight">
+            {slide.title}
+          </h1>
+          <p className="text-xl md:text-2xl mb-8 max-w-2xl font-light">
+            {slide.subtitle}
+          </p>
+          <a
+            href={slide.ctaLink}
+            target={slide.isExternal ? '_blank' : '_self'}
+            rel={slide.isExternal ? 'noopener noreferrer' : ''}
+            className="inline-block px-8 py-4 bg-white text-black hover:bg-white/90 transition-colors font-semibold uppercase tracking-widest text-sm"
+          >
+            {slide.ctaText}
+          </a>
         </div>
-        <button onClick={nextSlide} className="p-2 text-white/60 hover:text-white transition-colors">
-          <ChevronRight size={32} />
-        </button>
       </div>
-    </header>
+
+      <button
+        onClick={prevSlide}
+        className="absolute left-6 md:left-12 top-1/2 -translate-y-1/2 p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white transition-all"
+        aria-label="Previous slide"
+      >
+        <ChevronLeft size={32} />
+      </button>
+      <button
+        onClick={nextSlide}
+        className="absolute right-6 md:right-12 top-1/2 -translate-y-1/2 p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white transition-all"
+        aria-label="Next slide"
+      >
+        <ChevronRight size={32} />
+      </button>
+
+      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex gap-2">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentSlide(index)}
+            className={`h-2 rounded-full transition-all ${index === currentSlide ? 'bg-white w-8' : 'bg-white/50 w-2'}`}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
+      </div>
+    </div>
   );
 };
 

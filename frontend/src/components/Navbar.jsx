@@ -1,61 +1,73 @@
-import React, { useState } from 'react';
-import { Menu, X, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
+import logoImage from '../assets/saat-saath-logo.png';
 
-const Navbar = ({ scrolled }) => {
+const navLinks = [
+  { name: 'Grants', href: '/grants' },
+  { name: 'Programs', href: '/programs' },
+  { name: 'Sculpture Park', href: '/sculpture-park' },
+];
+
+const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
+  const isHome = location.pathname === '/';
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  const navLinks = [
-    { name: 'About', href: '#about' },
-    { name: 'Grants', href: '#grants' },
-    { name: 'Programs', href: '#programs' },
-    { name: 'Sculpture Park', href: 'https://www.thesculpturepark.org/', external: true },
-  ];
+  const transparent = isHome && !scrolled;
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-md py-4' : 'bg-transparent py-6'}`}>
-      <div className="container mx-auto px-6 flex justify-between items-center">
-        <a href="#" className={`text-xl font-bold uppercase tracking-wider z-50 ${scrolled ? 'text-black' : 'text-white'}`}>
-          Saat Saath Arts
-        </a>
+    <nav className={`fixed w-full z-50 transition-all duration-300 ${transparent ? 'bg-transparent py-5' : 'bg-white/95 backdrop-blur-sm shadow-sm py-3'}`}>
+      <div className="container mx-auto max-w-7xl px-6 flex justify-between items-center">
+        <Link to="/" className="z-50 h-16 flex items-center">
+          <img
+            src={logoImage}
+            alt="Saat Saath Arts"
+            className={`h-16 w-auto transition-all duration-300 ${transparent ? 'brightness-0 invert' : ''}`}
+          />
+        </Link>
 
-        {/* Desktop Nav */}
-        <div className="hidden md:flex space-x-8 items-center">
+        <div className="hidden md:flex space-x-10 items-center">
           {navLinks.map((link) => (
-            <a 
-              key={link.name} 
-              href={link.href}
-              target={link.external ? "_blank" : "_self"}
-              rel={link.external ? "noopener noreferrer" : ""}
-              className={`text-xs uppercase tracking-widest hover:opacity-70 transition-opacity flex items-center gap-1 ${scrolled ? 'text-black' : 'text-white'}`}
+            <Link
+              key={link.name}
+              to={link.href}
+              className={`text-sm font-semibold uppercase tracking-[0.15em] hover:opacity-70 transition-opacity ${transparent ? 'text-white' : 'text-black'}`}
             >
               {link.name}
-              {link.external && <ExternalLink size={12} />}
-            </a>
+            </Link>
           ))}
         </div>
 
-        {/* Mobile Menu Button */}
-        <button onClick={toggleMenu} className={`md:hidden z-50 ${isMenuOpen ? 'text-black' : (scrolled ? 'text-black' : 'text-white')}`}>
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        <button
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className={`md:hidden z-50 ${transparent && !isMenuOpen ? 'text-white' : 'text-black'}`}
+        >
+          {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
       </div>
 
-      {/* Mobile Nav Overlay */}
-      <div className={`fixed inset-0 bg-white text-black flex flex-col items-center justify-center space-y-8 transition-transform duration-300 ease-in-out md:hidden ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        {navLinks.map((link) => (
-          <a 
-            key={link.name} 
-            href={link.href} 
-            onClick={toggleMenu}
-            target={link.external ? "_blank" : "_self"}
-            className="text-2xl font-light uppercase tracking-widest"
-          >
-            {link.name}
-          </a>
-        ))}
-      </div>
+      {isMenuOpen && (
+        <div className="md:hidden fixed inset-0 bg-black/95 flex flex-col items-center justify-center space-y-8 text-white">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              to={link.href}
+              onClick={() => setIsMenuOpen(false)}
+              className="text-2xl font-light uppercase tracking-wider hover:opacity-70 transition-opacity"
+            >
+              {link.name}
+            </Link>
+          ))}
+        </div>
+      )}
     </nav>
   );
 };

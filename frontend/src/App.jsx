@@ -1,46 +1,58 @@
-import { useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { AuthProvider } from './admin/context/AuthContext'
-import ProtectedRoute from './admin/components/ProtectedRoute'
+import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './admin/context/AuthContext';
+import ProtectedRoute from './admin/components/ProtectedRoute';
+import api from './admin/utils/api';
 
-import Navbar from './components/Navbar'
-import Hero from './components/Hero'
-import About from './components/About'
-import Grants from './components/Grants'
-import Programs from './components/Programs'
-import Footer from './components/Footer'
-import AIModal from './components/AIModal'
+import Navbar from './components/Navbar';
+import Hero from './components/Hero';
+import About from './components/About';
+import ProgramsSection from './components/Programs';
+import GrantsSection from './components/Grants';
+import Footer from './components/Footer';
 
-import Login from './admin/pages/Login'
-import Dashboard from './admin/pages/Dashboard'
-import AdminPrograms from './admin/pages/Programs'
-import AdminGrants from './admin/pages/Grants'
+import GrantsPage from './pages/GrantsPage';
+import ProgramsPage from './pages/ProgramsPage';
+import SculptureParkPage from './pages/SculptureParkPage';
+import ConjecturesPage from './pages/ConjecturesPage';
 
-function PublicSite() {
-  const [scrolled, setScrolled] = useState(false)
-  const [isModalOpen, setIsModalOpen] = useState(false)
+import Login from './admin/pages/Login';
+import Dashboard from './admin/pages/Dashboard';
+import AdminHomePage from './admin/pages/HomePage';
+import AdminAboutPage from './admin/pages/AboutPage';
+import AdminFooterPage from './admin/pages/FooterPage';
+import AdminGrantsEditor from './admin/pages/GrantsEditor';
+import AdminProgramsEditor from './admin/pages/ProgramsEditor';
+import AdminSculptureParkEditor from './admin/pages/SculptureParkEditor';
+import AdminConjecturesEditor from './admin/pages/ConjecturesEditor';
+import AdminHomepageSections from './admin/pages/HomepageSectionsEditor';
 
-  const API_KEY = 'YOUR_GEMINI_API_KEY'
+function PublicLayout() {
+  const [sc, setSc] = useState(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50)
-    }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    api.get('/site-content').then((r) => setSc(r.data)).catch(() => {});
+  }, []);
 
   return (
-    <div className="font-sans">
-      <Navbar scrolled={scrolled} />
-      <Hero />
-      <About apiKey={API_KEY} />
-      <Grants />
-      <Programs />
-      <Footer onOpenModal={() => setIsModalOpen(true)} />
-      <AIModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} apiKey={API_KEY} />
-    </div>
-  )
+    <>
+      <Navbar />
+      <main>
+        <Routes>
+          <Route path="/" element={<>
+            <Hero slides={sc?.heroSlides} />
+            <About content={sc} />
+          </>} />
+          <Route path="/grants" element={<GrantsPage data={sc?.grants} bgImage={sc?.grantsPageBgImage} />} />
+          <Route path="/programs" element={<ProgramsPage data={sc?.programs} />} />
+          <Route path="/programs/conjectures-paper-sky" element={<ConjecturesPage data={sc?.conjectures} />} />
+          <Route path="/sculpture-park" element={<SculptureParkPage data={sc?.sculpturePark} />} />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </main>
+      <Footer contact={sc} />
+    </>
+  );
 }
 
 function App() {
@@ -48,37 +60,21 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<PublicSite />} />
           <Route path="/admin/login" element={<Login />} />
-          <Route
-            path="/admin/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/programs"
-            element={
-              <ProtectedRoute>
-                <AdminPrograms />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/grants"
-            element={
-              <ProtectedRoute>
-                <AdminGrants />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="/admin/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/admin/home" element={<ProtectedRoute><AdminHomePage /></ProtectedRoute>} />
+          <Route path="/admin/about" element={<ProtectedRoute><AdminAboutPage /></ProtectedRoute>} />
+          <Route path="/admin/footer" element={<ProtectedRoute><AdminFooterPage /></ProtectedRoute>} />
+          <Route path="/admin/grants" element={<ProtectedRoute><AdminGrantsEditor /></ProtectedRoute>} />
+          <Route path="/admin/programs" element={<ProtectedRoute><AdminProgramsEditor /></ProtectedRoute>} />
+          <Route path="/admin/sculpture-park" element={<ProtectedRoute><AdminSculptureParkEditor /></ProtectedRoute>} />
+          <Route path="/admin/conjectures" element={<ProtectedRoute><AdminConjecturesEditor /></ProtectedRoute>} />
+          <Route path="/admin/homepage-sections" element={<ProtectedRoute><AdminHomepageSections /></ProtectedRoute>} />
+          <Route path="/*" element={<PublicLayout />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;
